@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block home %} active {% endblock home %}
+
+{% block content %}
+
+  <!--Main layout-->
+  <main style="word-wrap: break-word;">
+    <div class="container" style="margin-top: 100px;">
+    {% if messages %}
+      {% for message in messages %}
+      <p {% if message.tags %} class="alert alert-{{message.tags}} mb-5" {% endif %}>{{message}}</p>
+      {% endfor %}
+    {% endif %}
+
+      <h1 class="my-4"><strong>Search Results:</strong></h1>
+      {% if product|length < 1 %}
+      Your search - <b>{{query}}</b> - did not match any documents.<br><br>
+
+      Suggestions:
+      <ul>
+        <li>Make sure that all words are spelled correctly.</li>
+        <li>Make sure that your query contains few words.</li>
+        <li>Try different keywords.</li>
+        <li>Try more general keywords.</li>
+        <li>Try fewer keywords.</li>
+      </ul>
+      {% endif %}
+
+      <!--Section: Products v.3-->
+      <section class="text-center mb-4">
+
+        <!--Grid row-->
+
+        <div class="row wow fadeIn">
+
+          {% for prod in product %}
+          <!--Grid column-->
+          <div class="col-lg-3 col-md-6 mb-4">
+
+            <!--Card-->
+            <div class="card">
+
+              <!--Card image-->
+              <div class="view overlay">
+                <img src="{{ prod.image.url }}" class="card-img-top" height="300" alt="">
+
+                <a href="{% url 'product_detail' prod.id %}" class="card-block clearfix">
+                  <div class="mask rgba-white-slight"></div>
+                </a>
+              </div>
+              <!--Card image-->
+
+              <!--Card content-->
+              <div class="card-body text-center">
+                <!--Category & Title-->
+                <a href="{% url 'product_detail' prod.id %}" class="grey-text">
+                  <h5>{{ prod.category }}</h5>
+                </a>
+                <h5>
+                  <strong>
+                    <a href="{% url 'product_detail' prod.id %}" class="dark-grey-text">{{ prod.title }}
+                {% if prod.label %}
+                   <span class="badge badge-pill {{ prod.get_label_display }}-color ml-1">{{prod.tag}}</span>
+                {% endif %}
+                    </a>
+                  </strong>
+                </h5>
+
+                <h4 class="font-weight-bold blue-text">
+                {% if prod.discounted_price %}
+                  <strong><i class="fa mr-1" style="font-size: 18px;">&#xf156;</i>{{ prod.discounted_price|intcomma }}</strong>
+                {% else %}
+                  <strong><i class="fa mr-1" style="font-size: 18px;">&#xf156;</i>{{ prod.price|intcomma }}</strong>
+                {% endif %}  
+                </h4>
+              </div>
+              <!--Card content-->
+
+            </div>
+            <!--Card-->
+
+          </div>
+          <!--Grid column-->
+
+          {% endfor %}
+        </div>
+        <!--Fourth column-->
+    </div>
+    <!--Grid row-->
+
+    </section>
+    <!--Section: Products v.3-->
+
+    <!--Pagination-->
+    <nav class="d-flex justify-content-center wow fadeIn">
+      <ul class="pagination pg-blue">
+
+        <!--Arrow left-->
+        {% if product.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{product.previous_page_number}}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Previous</span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% for pg in product.paginator.page_range %}
+        {% if product.number == pg %}
+
+        <li class="page-item active"><a class="page-link" href="?page={{pg}}" class="btn btn-default">{{pg}}</a>
+        </li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="?page={{pg}}" class="btn">{{pg}}</a></li>
+
+        {% endif %}
+        {% endfor %}
+
+        {% if product.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{product.next_page_number}}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Next</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    <!--Pagination-->
+
+</div>
+</main>
+<!--Main layout-->
+
+
+{% endblock %}

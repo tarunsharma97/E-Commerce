@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+
+
+<!--Main layout-->
+<main class="mt-5 pt-4" style="overflow-x: hidden;">
+  <div class="container dark-grey-text mt-5" style="word-wrap: break-word;">
+    <div class="row">
+      <div class="col-md-6 mb-2">
+        <div class="mb-4" style="display: flex; justify-content: center; width: 100%; height: 400px;">
+          <img class="img-fluid" src="{{single_product.image.url}}" alt="" id="product-detail">
+        </div>
+
+        <!--slide-->
+        {% if prod_img %}
+        <div class="product-links-wap mb-3">
+          <div class="row" style="display: flex; justify-content: center;">
+            <div class="mr-3 activeimg">
+              <a href="#">
+                <img class="img-fluid thumbpic active" style="width: 50px; height: 50px;"
+                  src="{{single_product.image.url}}" alt="">
+              </a>
+            </div>
+            {% for pi in prod_img %}
+            <div class="mr-3 activeimg">
+              <a href="#">
+                <img class="img-fluid thumbpic" style="width: 50px; height: 50px;" src="{{pi.image.url}}" alt="">
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+        <!--/.slide-->
+      </div>
+
+      {% for prod in product %}
+      <!--Grid column-->
+      <div class="col-md-6 mb-4">
+        <!--Content-->
+        <div class="px-4" style="word-wrap: break-word;">
+          <a>
+            <p class="d-inline lead font-weight-bold">{{ prod.title }}</p>
+            {% if prod.label %}
+            <span class="badge {{prod.get_label_display}}-color">{{prod.tag}}</span>
+            {% endif %}
+          </a>
+          <p class="lead mt-2">
+            {% if prod.discounted_price %}
+          <div class="mr-1" style="font-size: 15px;">
+            <span style="font-size: 20px;"><i class="fa mr-1"
+                style="font-size: 18px;">&#xf156;</i>{{prod.discounted_price|intcomma}}.00</span>
+          </div>
+          <div class="mt-3">
+            <span style="font-size: 20px;"><strong>M.R.P.:</strong><del class="ml-2 mr-1"><i class="fa mr-1"
+                  style="font-size: 18px;">&#xf156;</i>{{prod.price|intcomma}}.00</del></span>
+            <small style="font-size: 17px;">({{product_discount_percentage}}% off)</small>
+          </div>
+          {% else %}
+          <span><i class="fa mr-1" style="font-size: 18px;">&#xf156;</i>{{prod.price|intcomma}}.00</span>
+          {% endif %}
+          </p>
+          <p class="font-weight-bold">Description</p>
+          <p><span id="dots">{{prod.description|truncatewords:75}}</span><span id="more"
+              style="display: none;">{{prod.description}}&nbsp;</span>
+            <a class="font-weight-bold" onclick="readMore()" id="readmore">Read more</a>
+          </p>
+          {% if single_product.size %}
+          <div class="row">
+            <div class="col-auto prod-size">
+              <ul class="list-inline pb-2">
+                <li class="list-inline-item font-weight-bold">Size :</li>
+                 {% for field in single_product.size  %}
+                  <label for="{{forloop.counter0}}" class="btn btn-primary btn-sm p-2 m-1 prodsize  {% if forloop.counter0 == 0 %} active {% endif %}">{{field}}</label>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+          {% endif %}
+
+          <form class="d-inline justify-content-left">
+            {% csrf_token %}
+            <!-- Default input -->
+            <strong class="font-weight-bold mr-1"><label for="qty">QTY:<label></strong>
+            <input type="number" value="1" id="qty" name="qty" style="width: 60px;">
+            <input type="hidden" value="{{prod.id}}" id="prod_id" name="prod_id">
+            {% for field in single_product.size  %}
+              <input type="radio" class="size" id="{{forloop.counter0}}" name="size" value="{{field}}"  {% if forloop.counter0 == 0 %} checked {% endif %}/>
+            {% endfor %}
+            {% if user.is_authenticated %}
+            {% if item_already_in_cart %}
+            <a href="{% url 'cart_item' %}" class="btn btn-warning btn-md my-0">Go to cart
+              <i class="fas fa-shopping-cart ml-1"></i>
+            </a>
+            {% else %}
+            <button class="btn btn-primary btn-md my-0" type="submit" formaction="/add-to-cart">Add to cart
+              <i class="fas fa-shopping-cart ml-1"></i>
+            </button>
+            {% endif %}
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary btn-md my-0" type="submit">Add to cart
+              <i class="fas fa-shopping-cart ml-1"></i>
+            </a>
+            {% endif %}
+            <button href="/buyNow/" type="submit" class="btn btn-danger btn-md my-0" formaction="/buyNow">Buy Now</button>
+          </form>
+         
+        </div>
+        <!--Content-->
+      </div>
+      <!--Grid column-->
+      {% endfor %}
+    </div>
+    <!--Grid row-->
+  </div>
+
+  <div class="container mt-5">
+    <h5 class="text-uppercase font-weight-bold">Reviews({{reviews|length}})</h5>
+    <hr class="mt-0 pt-0">
+    <div class="row">
+      <div class="col-sm-7 mt-2">
+        {% if reviews %}
+        {% for review in reviews %}
+        <div class="review-heading">
+          <a class="text-capitalize"><i class="far fa-user mr-1"></i>{{review.user.username}}</a>
+          <a class="ml-2"><i class="far fa-clock mr-1"></i>{{review.created_at}}</a>
+          <i class="fa fa-star {% if review.rate > 4 %} checked {% endif %}" style="float: right;"></i>
+          <i class="fa fa-star {% if review.rate > 3 %} checked {% endif %}" style="float: right;"></i>
+          <i class="fa fa-star {% if review.rate > 2 %} checked {% endif %}" style="float: right;"></i>
+          <i class="fa fa-star {% if review.rate > 1 %} checked {% endif %}" style="float: right;"></i>
+          <i class="fa fa-star {% if review.rate > 0 %} checked {% endif %}" style="float: right;"></i>
+        </div>
+        <div class="review-body mt-2">
+          <p>{{review.comment}}</p>
+        </div>
+        <hr>
+        {% endfor %}
+        {% else %}
+        Doesn't have any review !!
+        {% endif %}
+      </div>
+      <div class="col-sm-5 mt-2">
+        <h5 class="text-uppercase font-weight-bold">Write Your Review</h5>
+
+        <form class="review-form" method="GET" action="/review">
+          {% for prod in product %}
+          <input type="hidden" name="prod_id" id="prod_id" value="{{prod.id}}" />
+          {% endfor %}
+          <div class="form-group">
+            <textarea class="input" type="text" name="comment" placeholder="Your Review" required></textarea>
+          </div>
+          <div class="form-group">
+            <div class="input rating">
+              <p class="text-uppercase font-weight-bold">Your Rating: </p>
+              <div class="rating-wrapper">
+                <input type="radio" id="star-5" name="rate" value="5" /><label for="star-5" class="fas fa-star"></label>
+                <input type="radio" id="star-4" name="rate" value="4" /><label for="star-4" class="fas fa-star"></label>
+                <input type="radio" id="star-3" name="rate" value="3" /><label for="star-3" class="fas fa-star"></label>
+                <input type="radio" id="star-2" name="rate" value="2" /><label for="star-2" class="fas fa-star"></label>
+                <input type="radio" id="star-1" name="rate" value="1" required /><label for="star-1"
+                  class="fas fa-star"></label>
+              </div>
+            </div>
+          </div>
+          {% if user.is_authenticated %}
+          <button class="btn btn-danger btn-md m-0" type="submit">Post</button>
+          {% else %}
+          <p>You must be logged in for post a review, <a href="{% url 'login' %}">Login</a></p>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!--Grid row-->
+  <div class="row d-flex justify-content-center">
+
+    <!--Grid column-->
+    <div class="col-md-6 text-center">
+
+      <h4 class="my-4 h4">Additional information</h4>
+
+      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus suscipit modi sapiente illo soluta odit
+        voluptates,
+        quibusdam officia. Neque quibusdam quas a quis porro? Molestias illo neque eum in laborum.</p>
+
+    </div>
+    <!--Grid column-->
+
+  </div>
+  <!--Grid row-->
+
+  <!--Grid row-->
+  <div class="row text-center">
+
+    <!--Grid column-->
+    <div class="col-lg-4 col-md-12 mb-4">
+
+      <img src="{% static 'img/15.jpg' %}" class="img-fluid" alt="">
+
+    </div>
+    <!--Grid column-->
+
+    <!--Grid column-->
+    <div class="col-lg-4 col-md-6 mb-4">
+
+      <img src="{% static 'img/39.jpg' %}" class="img-fluid" alt="">
+
+    </div>
+    <!--Grid column-->
+
+    <!--Grid column-->
+    <div class="col-lg-4 col-md-6 mb-4">
+
+      <img src="{% static 'img/16.jpg' %}" class="img-fluid" alt="">
+
+    </div>
+    <!--Grid column-->
+
+  </div>
+  <!--Grid row-->
+
+  </div>
+</main>
+<!--Main layout-->
+
+
+{% endblock %}
+
+{% block js %}
+
+<script type="text/javascript">
+
+  $('.size').on('click', function () {
+    $('.size').removeClass('active');
+    $(this).addClass('active');
+  })
+
+  $('.thumbpic').on('click', function () {
+    $('.thumbpic').removeClass('active');
+    $(this).addClass('active');
+  })
+
+  $('.prodsize').on('click', function () {
+    $('.prodsize').removeClass('active');
+    $(this).addClass('active');
+  })
+
+  $('.product-links-wap a').click(function () {
+    var this_src = $(this).children('img').attr('src');
+    $('#product-detail').attr('src', this_src);
+    return false;
+  });
+
+  //handle addtocart......
+
+  $(document).on('submit', '#add-to-cart-form', function (e) {
+    e.preventDefault();
+
+    $.ajax({
+      type: 'GET',
+      url: '{% url "add_to_cart" %}',
+      data:
+      {
+        prod_id: $("#prod_id").val(),
+        size: $(".size").val(),
+        qty: $("#qty").val(),
+        csrfmiddelwaretoken: $('input[name=csrfmiddelwaretoken]').val()
+      },
+      success: function () {
+        window.location.reload();
+      }
+    })
+  });
+
+  //handle readmore......
+
+  function readMore() {
+    var dots = document.getElementById('dots');
+    var moreText = document.getElementById('more');
+    var btnText = document.getElementById('readmore');
+
+    if (dots.style.display == 'none') {
+      dots.style.display = 'inline';
+      btnText.innerHTML = 'Read more';
+      moreText.style.display = 'none';
+    }
+    else {
+      dots.style.display = 'none';
+      btnText.innerHTML = 'Read less';
+      moreText.style.display = 'inline';
+    }
+  }
+
+</script>
+
+{% endblock %}

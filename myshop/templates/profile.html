@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="container" style="margin-top: 120px;">
+    <div class="jumbotron" style="width: 100%;">
+        <div class="row">
+            <div class="media col-xl-4 p-2">
+                <div class="media-body text-center">
+                    {% if  p_form.profile_image  %}
+                    <img class="rounded-circle account-img shadow" height="150" width="150"
+                        src="{{ user.customer.profile_image.url }}">
+                    {% else %}
+                    <p></p>
+                    {% endif %}
+                    <h2 class="account-heading text-capitalize mt-4">{{ user.username }}</h2>
+                    <small>{{ user.email }}</small>
+                    <hr>
+                </div>
+            </div>
+            <div class="col-xl-8 p-2">
+
+                <form method="POST" action="" enctype="multipart/form-data">
+                    <h2 class="text-center mb-4">Update Profile</h2>
+                    <hr>
+                    {% csrf_token %}
+                    {% if messages %}
+                    {% for message in messages %}
+                    <p {% if message.tags %} class="alert alert-{{message.tags}} mb-5" {% endif %}>{{message}}</p>
+                    {% endfor %}
+                    {% endif %}
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-4 mt-3">
+                                {{u_form.username.label_tag}} {{u_form.username}}
+                                <small class="text-danger">{{u_form.username.errors|striptags}}</small>
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+                                {{u_form.first_name.label_tag}} {{u_form.first_name}}
+                                <small class="text-danger">{{u_form.first_name.errors|striptags}}</small>
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+                                {{u_form.last_name.label_tag}} {{u_form.last_name}}
+                                <small class="text-danger">{{u_form.last_name.errors|striptags}}</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mt-3">
+                                {{p_form.mobile_no.label_tag}} {{p_form.mobile_no}}
+                                <small class="text-danger">{{p_form.mobile_no.errors|striptags}}</small>
+                            </div>
+
+                            <div class="col-md-6 mt-3">
+                                {{u_form.email.label_tag}} {{u_form.email}}
+                                <small class="text-danger">{{u_form.email.errors|striptags}}</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mt-3">
+                                {{p_form.address1.label_tag}} {{p_form.address1}}
+                                <small class="text-danger">{{p_form.address1.errors|striptags}}</small>
+                            </div>
+
+                            <div class="col-md-6 mt-3">
+                                {{p_form.address2.label_tag}} {{p_form.address2}}
+                                <small class="text-danger">{{p_form.address2.errors|striptags}}</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mt-3">
+                                {{p_form.city.label_tag}} {{p_form.city}}
+                                <small class="text-danger">{{p_form.city.errors|striptags}}</small>
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+                                {{p_form.state.label_tag}} {{p_form.state}}
+                                <small class="text-danger">{{p_form.state.errors|striptags}}</small>
+                            </div>
+
+                            <div class="col-md-4 mt-3">
+                                {{p_form.zip_code.label_tag}} {{p_form.zip_code}}
+                                <small class="text-danger">{{p_form.zip_code.errors|striptags}}</small>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mt-3">
+                                {{p_form.profile_image.label_tag}} {{p_form.profile_image}}
+                                <small class="text-danger">{{p_form.profile_image.errors|striptags}}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="submit" value="Save" class="btn btn-primary my-2">
+
+                    {% if u_form.non_field_errors %}
+                    {% for error in u_form.non_field_errors %}
+                    <p class="alert alert-danger my-3">{{error}}</p>
+                    {% endfor %}
+                    {% endif %}
+                    {% if p_form.non_field_errors %}
+                    {% for error in p_form.non_field_errors %}
+                    <p class="alert alert-danger my-3">{{error}}</p>
+                    {% endfor %}
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

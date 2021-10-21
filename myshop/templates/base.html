@@ -1,0 +1,234 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,
+      shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>ShoppingCart</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="{% static 'css/mdb.min.css' %}" rel="stylesheet">
+    <!-- Your custom styles (optional) -->
+    <link href="{% static 'css/style.min.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="container-fluid fixed-top navbar-expand-lg">
+        <div class="row">
+            <!-- Brand -->
+            <div class="brand">
+                <a class="navbar-brand waves-effect" href="/" target="_blank">
+                    <span>
+                        <img src="{% static 'img/logo1.jpg' %}" class="logo">
+                    </span>
+                    <strong class="white-text">ShoppingCart</strong>
+                </a>
+            </div>
+            <!-- /Brand -->
+
+            <!--signin-->
+            {% if user.is_anonymous %}
+            <div id="signinpage">
+                <a href="{% url 'login' %}">Sign In</a>
+            </div>
+            {% endif %}
+            <!-- /signin -->
+
+            <!--cart-->
+            <div class="cart-item">
+                <a href="{% url 'cart_item' %}" class="cart waves-effect">
+                    {% if user.is_anonymous %}
+                    <span class="cart-basket d-flex align-items-center justify-content-center">0</span>
+                    {% else %}
+                    <span class="cart-basket d-flex align-items-center justify-content-center">{{cart_quantity}}</span>
+                    {% endif %}
+                    <span>
+                        <img class="cart-image" src="{% static 'img/shoppingcart.png' %}">
+                    </span>
+                    <span class="text-white">Cart</span>
+                </a>
+            </div>
+            <!--/cart-->
+            <!-- Links -->
+            <input type="checkbox" id="check">
+            <label for="check">
+                <i class="fas fa-bars" id="btn"></i>
+                <i class="fas fa-times" id="cancel"></i>
+            </label>
+            <!--search bar-->
+            <div class="searchbar">
+                <form action="/search" method="GET">
+                    <input class="search" name="query" id="query" type="search" placeholder="Search..." aria-label="Search">
+                    <button class="search-btn" type="submit" style="border: none;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+            <!--/search bar-->
+            <div class="slbar">
+                <header>My Menu</header>
+                <ul class="main-menu">
+                    {% if user.is_authenticated %}
+                    <li class="{% block home %} {% endblock home %}">
+                        <a href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li>
+                        <div class="dropdown">
+                            <a class="text-white dropdown-toggle text-capitalize" type="button"
+                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+                                {{user.username}}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
+                                <a class="dropdown-item" href="{% url 'orders' %}">My Order</a>
+                                <a class="dropdown-item" href="{% url 'password_change' %}">Change Password</a>
+                                <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                            </div>
+                        </div>
+                    </li>
+                    {% endif %}
+
+
+
+                    <div id="strong">CATEGORIES</div>
+                    <li id="categoryitems">
+                        <a href="{% url 'all_category' %}">All</a>
+                    </li>
+                    {% for category in categories %}
+                    <li id="categoryitems">
+                        <a href="{% url 'category' category.id %}">{{ category }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- /Navbar -->
+
+    {% block content %}{% endblock %}
+
+    <!--Footer-->
+    <footer class="page-footer text-center font-small mt-5">
+        <hr class="my-4">
+        <!-- Social icons -->
+        <div class="pb-4">
+            <a href="#" target="_blank">
+                <i class="fab fa-facebook-f mr-3"></i>
+            </a>
+            <a href="#" target="_blank">
+                <i class="fab fa-twitter mr-3"></i>
+            </a>
+            <a href="#" target="_blank">
+                <i class="fab fa-youtube mr-3"></i>
+            </a>
+            <a href="#" target="_blank">
+                <i class="fab fa-google-plus-g mr-3"></i>
+            </a>
+            <a href="#" target="_blank">
+                <i class="fab fa-github mr-3"></i>
+            </a>
+        </div>
+        <!-- Social icons -->
+        <!--Copyright-->
+        <div class="footer-copyright py-3">
+            © 2021 Copyright:
+            <a href="#" target="_blank"> ShoppingCart.com</a>
+        </div>
+        <!--/.Copyright-->
+    </footer>
+    <!--/.Footer-->
+    <!-- SCRIPTS -->
+    <!-- JQuery -->
+    <script type="text/javascript" src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="{% static 'js/popper.min.js' %}"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="{% static 'js/mdb.min.js' %}"></script>
+    <!-- Initializations -->
+    
+    {% block js %}{% endblock %}
+    <script type="text/javascript">
+        // Animations initialization
+        new WOW().init();
+
+    $('.plus-item').click(function(){
+        var id = $(this).attr("pid").toString();
+        var eml = this.parentNode.children[2]
+
+         $.ajax({
+            type:'GET',
+            url:  "/plus_minus_item",
+            data:
+            {
+                plus_id: id
+            },
+            success:function(data){
+                document.getElementById("amount").innerText = data.amount 
+                document.getElementById("totalamount").innerText = data.total_amount
+                eml.innerText = data.quantity  
+                window.location.reload();  
+            }
+        })
+      
+    });
+
+
+    $('.minus-item').click(function(){
+        var id = $(this).attr("pid").toString();
+        var eml = this.parentNode.children[2]
+
+         $.ajax({
+            type:'GET',
+            url:  "/plus_minus_item",
+            data:
+            {
+                minus_id: id
+            },
+            success:function(data){ 
+                document.getElementById("amount").innerText = data.amount 
+                document.getElementById("totalamount").innerText = data.total_amount
+                eml.innerText = data.quantity 
+                window.location.reload() 
+            }
+        })
+      
+    });
+
+
+    $('.remove-item').click(function(){
+        var id = $(this).attr("pid").toString();
+        var eml = this
+
+        $.ajax({
+            type:'GET',
+            url:  "/cart-item",
+            data:
+            {
+                remove_id: id
+            },
+            success:function(data){
+                document.getElementById("amount").innerText = data.amount 
+                document.getElementById("totalamount").innerText = data.total_amount
+                eml.parentElement.parentElement.parentElement.parentElement.remove()
+                window.location.reload();
+            }
+        })
+        
+    });
+
+
+    </script>
+</body>
+
+</html>

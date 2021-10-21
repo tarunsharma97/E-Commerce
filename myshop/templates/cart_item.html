@@ -1,0 +1,140 @@
+{% extends "base.html" %} {% load static %} {% load humanize %} {% block content %}
+<div class="container" style="margin-top: 120px">
+    <div class="row">
+        {% if ci_len == 0 %}
+        <h3 class="text-center mb-5 w-100" style="font-weight: 500">
+            Sorry, Cann't load this page !!
+        </h3>
+        <div class="text-center" style="margin-left: 37%; margin-right: 37%">
+            <img src="{% static 'img/empty_cart.gif' %}" alt="" class="img-fluid" />
+        </div>
+        {% else %}
+        <h1 class="text-center mb-3 w-100" style="font-weight: 400">
+            Shopping Cart
+        </h1>
+        <div class="col-sm-8 mt-3">
+            <div class="card">
+                <div class="card-body">
+                    <h3>Cart</h3>
+                    {% for item in cart_item %}
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-3 text-center align-self-center">
+                            <img src="{{item.product.image.url}}" alt="" class="img-fluid img-thumbnail shadow-sm"
+                                height="150" width="150" />
+                        </div>
+                        <div class="col-sm-9">
+                            <div>
+                                <h5>{{item.product.title}}</h5>
+                                <p class="mb-2 text-muted small">
+                                    {{item.product.description|truncatewords:30}}
+                                </p>
+                                <div class="mt-3">
+                                    <label for="quantity">Quantity:</label>
+                                    {% if item.quantity == 1 %}
+
+                                    {% else %}
+                                    <a class="minus-item ml-3" pid="{{item.product.id}}"><i
+                                            class="fas fa-minus-square"></i></a>
+                                    {% endif %}
+                                    <span class="ml-2" id="quantity">{{item.quantity}}</span>
+                                    <a class="plus-item ml-2" pid="{{item.product.id}}"><i
+                                            class="fas fa-plus-square"></i></a><br />
+                                    {% if item.prod_size %}
+                                    <label for="Size">Size:</label>
+                                    <span class="ml-2 mt-0">{{item.prod_size}}</span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a class="btn btn-sm mr-3 remove-item ml-0" pid="{{item.product.id}}"
+                                        style="background-color: #585858; color: #fff">Remove Item</a>
+                                    {% if item.product.discounted_price %}
+                                    <p class="mb-0">
+                                        <span><strong><i class="fa" style="font-size: 15px">&#xf156;</i>
+                                                {{item.product.discounted_price|intcomma}}.00</strong></span>
+                                    </p>
+                                    {% else %}
+                                    <p class="mb-0">
+                                        <span><strong><i class="fa"
+                                                    style="font-size: 15px">&#xf156;</i>{{item.product.price|intcomma}}.00</strong></span>
+                                    </p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-4 mt-3">
+            <div class="card pt-1">
+                <div class="card-body">
+                    <h5 class="text-center"><strong>Price Details</strong></h5>
+                    <hr />
+                    <ul class="list-group">
+                        <li class="
+                list-group-item
+                d-flex
+                justify-content-between
+                align-items-center
+                border-0
+                px-0
+                pb-0
+              ">
+                            Amount<span><i class="fa mr-1" style="font-size: 15px">&#xf156;</i><span
+                                    id="amount">{{amount|intcomma}}</span>.00</span>
+                        </li>
+                        <li class="
+                list-group-item
+                d-flex
+                justify-content-between
+                align-items-center
+                border-0
+                px-0
+              ">
+                            Delivery charges<span><i class="fa mr-1"
+                                    style="font-size: 15px">&#xf156;</i>{{shipping_amount}}.00</span>
+                        </li>
+                    </ul>
+                    <hr />
+                    <li class="
+              list-group-item
+              d-flex
+              justify-content-between
+              align-items-center
+              border-0
+              px-0
+              pt-0
+              pb-3
+            ">
+                        <span><strong>Total</strong> (including VAT)</span>
+                        <span><strong id="totalamount"><i class="fa mr-1"
+                                    style="font-size: 15px">&#xf156;</i>{{total_amount|intcomma}}.00</strong></span>
+                    </li>
+                    <div class="mt-1">
+                        <a href="{% url 'checkout' %}" class="btn btn-primary btn-md btn-block">Place Order</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="mb-4">We accept</h5>
+                    <img src="{% static 'img/payment_options.jpg' %}" width="100%" alt="" class="img-fluid" />
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

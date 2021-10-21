@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <div class="container" style="margin-top: 100px;">
+    {% if user.is_anonymous %}
+        <div class="row my-3">
+            <div class="col-sm-6 offset-sm-3">
+                <h3>Registration</h3>
+                <hr>
+                <form method="POST" action="" novalidate class="shadow p-5">
+                {% csrf_token %}
+                 {% if messages %}
+                 {% for message in messages %}
+                 <p {% if message.tags %} class="alert alert-{{message.tags}} mb-5" {% endif %}>{{message}}</p> 
+                 {% endfor %}
+                 {% endif %}
+                {% for fm in form %}
+                    <div class="form-group mb-3">
+                        {{fm.label_tag}} {{fm}} <small class="text-danger">{{fm.errors|striptags}}</small>
+                    </div>
+                {% endfor %}
+                <input type="submit" value="Submit" class="btn btn-primary my-2">
+                <br>
+                <div class="text-center text-primary fw-bold mt-2"><small>Already have an account ? 
+                    <a href="{% url 'login' %}" class="text-danger ml-1">Login Now</a></small>
+                </div>
+                {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                <p class="alert alert-danger my-3">{{error}}</p>
+                {% endfor %}
+                {% endif %}
+                </form>
+            </div>
+        </div>
+  
+    {% else %}
+
+    <div class="text-center" style="margin-top: 150px; margin-bottom: 256px;">
+        <h1>Sorry, Cann't load this page !!</h1><br>
+        <h2>"user already logged in"</h2>
+    </div>
+
+    {% endif %}
+
+    </div>
+
+{% endblock %}
